@@ -1,0 +1,104 @@
+<html>
+	<head>
+	<title>Selection</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<!link href="/home/aicha/TWEB2/PROJET/css/main.css" type="text/css" rel="stylesheet">
+	<script type="text/javascript" src="jquery-1.8.2.min.js"></script>
+	<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+	<script type="text/javascript">
+
+			function Preload() {
+  				$.getJSON("http://localhost/conn_mysql.php", function(jsonData){  
+   			        $.each(jsonData, function(i,j){ 
+      				$('#ID-OF-YOUR-SELECT-ELEMENT').append(
+        			$('<option></option>').val(j.value).html(j.text)
+     				 );
+    				}
+ 				);
+				});}
+			
+			function creerListe(i) {			
+				
+				
+				count=1;
+				var j=i-1;
+				$('#'+j).bind("change",function(){
+				//$('#'+i).empty();
+				$('#selections input:checkbox').remove();
+				$('#selections label').remove();
+				
+				 
+				
+				for(var c=i;c<=i+count;c++){
+				
+				$('#'+c).empty();	
+				$('#'+c).remove();
+				$('#'+c+'input:checkbox').remove();
+				$('#'+c+'input:checkbox').empty();
+
+				}
+
+				$('select').parent().append('<select id='+i+'></select>');
+				
+				
+				
+				
+				$.getJSON($('#'+j).attr("value")+".json",function(dat){
+				//alert(""+$('#'+j).attr("value"));
+				
+				//$('#'+i).append("<option>Selectionner un element</option>");
+				
+				$.each(dat,function(cle,valeur){
+				/*$('#'+i).append(
+				$('<option></option>').val(valeur.value).html(valeur.text)
+				);*/
+				if (valeur.lat== undefined){
+				$('#'+i).append("<option value="+valeur.nom+">"+valeur.nom+"</option>");
+				}
+				else{
+				//alert(""+valeur.lat);
+				$('#'+i).parent().append('<input type="checkbox" value='+valeur.lat+':'+valeur.lng+':'+valeur.nom+" /><label>"+valeur.nom+"</label>");
+				
+
+				}
+				});
+				creerListe(i+1);
+				
+				});
+				count++;
+				});
+					
+    					
+				}
+	$(document).ready(function(){
+			
+
+			
+			$.getJSON('type_resto.json',function(data){
+			$.each(data,function(key,item){
+			   $('#1').append("<option value="+item.nom+">"+item.nom+"</option>");
+			});
+			});
+
+				creerListe(2);
+				
+			
+
+});  
+
+
+
+</script>
+	</head>
+
+	<body> 	
+	<h4>Sélections</h4>
+	<div id='selections'>
+	<select id=1><option>Selectionner un element</option></select>
+	
+	</div>
+        <div id="MaCarte" style="z-index:1; position:relative; width:600px; height:500px; border:solid 1px black; background-color:lightgray;">
+	<iframe  style="z-index:1; position:relative; width:600px; height:500px;"></iframe>
+	</div>
+	</body>
+</html>

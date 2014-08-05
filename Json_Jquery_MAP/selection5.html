@@ -1,0 +1,171 @@
+<html>
+	<head>
+	<title>Selection</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<!link href="/home/aicha/TWEB2/PROJET/css/main.css" type="text/css" rel="stylesheet">
+	<script type="text/javascript" src="jquery-1.8.2.min.js"></script>
+	<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+	<script type="text/javascript">
+
+function Preload() {
+  $.getJSON("http://localhost/conn_mysql.php", function(jsonData){  
+    $.each(jsonData, function(i,j){ 
+      $('#ID-OF-YOUR-SELECT-ELEMENT').append(
+        $('<option></option>').val(j.value).html(j.text)
+      );
+    }
+  );
+});}
+
+
+$(document).ready(function(){
+			var n=1;
+			function creerListe(i) {
+				var cont;
+				$('select').parent().append('<select id='+i+'></select>');
+				$('#'+i-1).bind("change",function(){
+				$('#'+i+1).remove();
+				$('#'+i+' option').empty();
+				$('#'+i+1+' option').empty();		
+				$.getJSON($(this).attr("value")+".json",function(dat){
+				cont++;
+				$('#'+i).append("<option>Selectionner un element</option>");
+				$.each(dat,function(cle,valeur){
+				$('#'+i).append("<option value="+valeur.nom+">"+valeur.nom+"</option>");
+				myfunc(i+1)	
+				});
+				});
+				});
+    				
+    				if(!cond){//you need a condition, or it'll recurse indefinitely.
+      			 	creerListe();
+    				}
+
+    				return false;
+				}  
+
+
+			var num=0;
+			var count=1;
+		$.getJSON('type_resto.json',function(data){
+			$.each(data,function(key,item){
+			   $('#selection1').append("<option value="+item.nom+">"+item.nom+"</option>");
+			});
+				
+				$('select').parent().append('<select id='+num+'></select>');
+				$('#selection1').bind("change",function(){
+				count++;
+				for (var j=0;j<=count;j++){
+					$('#'+num+j).remove();
+					$('#'+num+j+' option').empty();
+					}
+				/*$('#'+num+1).remove();
+				$('#'+num+' option').empty();
+				$('#'+num+1+' option').empty();*/
+				//var index=$("#selection1 option:selected").prevAll().size();			
+				$.getJSON($(this).attr("value")+".json",function(dat){
+				$('#'+num).append("<option>Selectionner un element</option>");
+				$.each(dat,function(cle,valeur){
+				$('#'+num).append("<option value="+valeur.nom+">"+valeur.nom+"</option>");	
+				});
+					//Parcours de la deuxieme liste deroulante
+					
+					$('select').parent().append('<select id='+num+1+'></select>');
+					
+					$('#'+num).bind("change",function(){  
+					count++; 
+					$('#'+num+1+' option').empty();			
+					$.getJSON($(this).attr("value")+".json",function(dat){
+					$('#'+num+1).append("<option>Selectionner un element</option>");
+					$.each(dat,function(cle,valeur){
+					$('#'+num+1).append("<option value="+valeur.lat+":"+valeur.lng+":"+valeur.nom+">"+valeur.nom+"</option>");
+					//alert("valeur:"+valeur.lat+":"+valeur.lng+":"+valeur.nom);
+
+						
+					});
+							//Parcours de la derniere liste deroulante
+							$('#'+num+1).bind("change",function(){
+							alert("Nbre de listes"+count);
+						        //***var tab=$(this).attr("value").split(":");
+						        //***var point=$(this).latlng(tab[0],tab[1]);
+									
+								alert(""+$('#'+num+1).attr("value"));
+								//alert(""+$('#'+num+1+' option:selected').text());	
+								//Placer les valeurs sur la carte
+								var latlng=new google.maps.LatLng(43.6111, 3.87667);
+								var myOptions={zoom:12,
+ 		      							       center:latlng,
+		      							       mapTypeId:google.maps.MapTypeId.ROADMAP
+		     							        };
+								var map=new google.maps.Map(document.getElementById("MaCarte"),myOptions);
+        							
+								
+								
+
+	   							var tab=$('#'+num+1).attr("value").split(":");
+
+								//var index=$("#selection3 option:selected").prevAll().size();//indice de l'element selectionné
+								
+              							var lat=tab[0];
+	      							var lng=tab[1];
+								//var nom=tab[2];
+								var nom=$('#'+num+1+' option:selected').text();
+	     			 				//alert(""+lat+":"+lng);
+								var desc="Restaurant:"+nom;
+
+	      							var point=new google.maps.LatLng(lat,lng);
+              							var marker=new google.maps.Marker({
+													position:point,
+													map:map
+  	     											   });
+
+	      							var infoWindow = new google.maps.InfoWindow();
+	      							var html='<b>'+desc+'</b>';
+	      							google.maps.event.addListener(marker,'click',function(){
+		    								infoWindow.setContent(html);
+		    								infoWindow.open(map,marker);
+              
+	    									 });
+          
+      								 
+							         
+								
+
+								// Elements placés sur la carte
+
+						        });
+							//
+					
+					});
+					$('#'+num+1+' option').remove();
+					});
+					//
+
+				});
+				$('#'+num+' option').remove();
+				$('#'+num+1+' option').remove();
+				});
+				
+				
+
+			
+
+		
+			
+			
+	        });
+	});
+</script>
+	</head>
+
+	<body> 	
+	<h4>Sélections</h4>
+	<div>
+	<select id="selection1"><option>Selectionner un element</option></select>
+	
+	</div>
+        <div id="MaCarte" style="z-index:1; position:relative; width:600px; height:500px; border:solid 1px black; background-color:lightgray;">
+	<iframe  style="z-index:1; position:relative; width:600px; height:500px;"></iframe>
+	</div>
+	</body>
+</html>

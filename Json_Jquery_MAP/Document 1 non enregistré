@@ -1,0 +1,22 @@
+function myfunc() {
+    var id = $('#media-photo img').attr('id');
+    var href = $(this).attr('href');
+    href = href.split('/');
+    var p = href[href.length - 1];
+    var url = '/view/album-photos/id/' + id + '/p/' + p;
+
+    $.get(url, function(data) {
+        $('.box-content2').replaceWith('<div class="box-content2"' + data + '</div>');
+    });
+
+    if(!cond){//you need a condition, or it'll recurse indefinitely.
+       myfunc();
+    }
+
+    return false;
+}
+
+$('a.previous-photos, a.next-photos').click(function(){myfunc();});
+
+
+
